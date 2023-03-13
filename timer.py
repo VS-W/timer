@@ -1,8 +1,10 @@
 import os, sys, pathlib
 
 from PyQt5.QtCore import Qt, QTimer, QSize, QSettings, QRect
-from PyQt5.QtGui import QFont, QFontDatabase, QPainter, QColor, QIcon
+from PyQt5.QtGui import QFont, QFontDatabase, QPainter, QColor, QIcon, QFontDatabase
 from PyQt5.QtWidgets import QSizeGrip, QInputDialog, QLineEdit, QApplication, QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QGraphicsOpacityEffect, QGraphicsColorizeEffect
+
+FIXED_FONT = "Chivo Mono"
 
 # Logic for resizing transparent window obtained from: https://stackoverflow.com/a/62812752
 # Licensed [CC BY-SA 4.0] - https://creativecommons.org/licenses/by-sa/4.0/
@@ -75,18 +77,16 @@ class closeBtn(QPushButton):
 				color: rgba(255, 255, 255, .6);
 			}
 		""")
-		self.setFont(QFont("Consolas", 16))
+		self.setFont(QFont(FIXED_FONT, 12))
 		self.setFixedHeight(16)
 		self.setFixedWidth(14)
 		self.setText("x")
 
 	def mousePressEvent(self, QMouseEvent):
 		if QMouseEvent.button() == Qt.LeftButton:
-			global app
 			app.exit()
 		elif QMouseEvent.button() == Qt.RightButton:
-			global w
-			w.move(-3, 60)
+			self.parent().move(-3, 60)
 
 class RefreshLoop(QWidget):
 	def __init__(self):
@@ -220,7 +220,7 @@ class TimeLabel(QLabel):
 			return "00:{}".format(zeropad(seconds))
 
 	def initUI(self):
-		self.setFont(QFont("Calibri", 38))
+		self.setFont(QFont(FIXED_FONT, 35))
 		self.setStyleSheet("color: white;")
 		self.setAlignment(Qt.AlignCenter)
 		self.setFixedHeight(40)
@@ -250,25 +250,25 @@ class TimeLabel(QLabel):
 			op = QGraphicsColorizeEffect()
 			op.setColor(QColor(89, 6, 0))
 
-			try:
-				w.setGraphicsEffect(op)
-			except Exception as e:
-				pass
+			# try:
+			self.parent().parent().setGraphicsEffect(op)
+			# except Exception as e:
+			# 	pass
 		else:
 			self.setStyleSheet("color: red;")
 
 			op = QGraphicsColorizeEffect()
-			try:
-				w.setGraphicsEffect(None)
-			except Exception as e:
-				pass
+			# try:
+			self.parent().parent().setGraphicsEffect(None)
+			# except Exception as e:
+			# 	pass
 
 	def clearTimerExpiredTheme(self):
 		self.setStyleSheet("color: white;")
-		try:
-			w.setGraphicsEffect(None)
-		except Exception as e:
-			pass
+		# try:
+		self.parent().parent().setGraphicsEffect(None)
+		# except Exception as e:
+		# 	pass
 
 class RefreshButton(QPushButton):
 	def __init__(self, controller):
@@ -317,14 +317,15 @@ class RefreshButton(QPushButton):
 			self.refreshLoopController.resetTimer()
 
 class BgLayer(QWidget):
-	def __init__(self):
-		super().__init__()
+	def __init__(self, parent):
+		super().__init__(parent)
 		self.initUI()
 
 	def initUI(self):
 		self.alwaysOnTopBtnActive = False
 
 		timelabel = TimeLabel()
+		timelabel.setParent(self)
 
 		refreshLoopController = RefreshLoop()
 		refreshLoopController.setTimeLabel(timelabel)
@@ -332,8 +333,6 @@ class BgLayer(QWidget):
 
 		refreshLoopbtn = RefreshButton(refreshLoopController)
 		self.refreshLoopbtn = refreshLoopbtn
-
-		QFontDatabase.addApplicationFont("GothicA1-Medium.ttf")
 
 		alwaysOnTopbtn = QPushButton()
 		alwaysOnTopbtn.setIcon(QIcon(resource_path('eye.png')))
@@ -373,7 +372,7 @@ class BgLayer(QWidget):
 			}
 		""")
 		settingsbtn.setIcon(QIcon(resource_path('gear.png')))
-		settingsbtn.setIconSize(QSize(25, 25))
+		settingsbtn.setIconSize(QSize(18, 18))
 		settingsbtn.setFixedSize(20, 20)
 		settingsbtn.setToolTip('Set timer length.')
 		btnOverlay2 = QGraphicsColorizeEffect()
@@ -386,8 +385,8 @@ class BgLayer(QWidget):
 		buttonContainerLayout.addWidget(refreshLoopbtn)
 		buttonContainerLayout.addWidget(alwaysOnTopbtn)
 		buttonContainerLayout.addWidget(settingsbtn)
-		buttonContainerLayout.setSpacing(5)
-		buttonContainerLayout.setContentsMargins(0, 6, 0, 0)
+		buttonContainerLayout.setSpacing(0)
+		buttonContainerLayout.setContentsMargins(0, 2, 0, 0)
 
 		timeLayout = QHBoxLayout()
 		timeLayout.addWidget(timelabel)
@@ -395,34 +394,31 @@ class BgLayer(QWidget):
 		layout = QVBoxLayout()
 		layout.addLayout(buttonContainerLayout)
 
-		timeLayout.setContentsMargins(6, 0, 6, 8)
+		timeLayout.setContentsMargins(0, 4, 0, 4)
 		layout.addLayout(timeLayout)
 
 		layout.setContentsMargins(0, 0, 0, 0)
-		layout.setSpacing(6)
+		layout.setSpacing(0)
 
 		self.setLayout(layout)
 
 	def alwaysOnTopButtonClicked(self):
-		global w
-
 		if self.alwaysOnTopBtnActive:
 			self.alwaysOnTopBtnActive = False
 			btnOverlay1 = QGraphicsColorizeEffect()
 			btnOverlay1.setColor(QColor(120, 120, 120))
 			self.alwaysOnTopbtn.setGraphicsEffect(btnOverlay1)
-			w.setWindowFlags(Qt.FramelessWindowHint)
-			w.show()
+			self.parent().setWindowFlags(Qt.FramelessWindowHint)
+			self.parent().show()
 		else:
 			self.alwaysOnTopBtnActive = True
 			btnOverlay1 = QGraphicsColorizeEffect()
 			btnOverlay1.setColor(QColor(200, 200, 200))
 			self.alwaysOnTopbtn.setGraphicsEffect(btnOverlay1)
-			w.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-			w.show()
+			self.parent().setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+			self.parent().show()
 
 	def settingsButtonClicked(self):
-		global w
 		if self.refreshLoopController.settings.value("timer_length"):
 			originalText = self.refreshLoopController.settings.value("timer_length")
 		else:
@@ -444,7 +440,7 @@ class ExLayer(QWidget):
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.setAttribute(Qt.WA_TranslucentBackground)
 
-		bgLayer = BgLayer()
+		bgLayer = BgLayer(self)
 		self.bgLayer = bgLayer
 
 		layout = QVBoxLayout()
@@ -466,7 +462,6 @@ class ExLayer(QWidget):
 		btn = closeBtn()
 		self.btn = btn
 		btn.setParent(self)
-
 
 	# Logic for resizing transparent window obtained from: https://stackoverflow.com/a/62812752
 	# Licensed [CC BY-SA 4.0] - https://creativecommons.org/licenses/by-sa/4.0/
@@ -549,6 +544,20 @@ def resource_path(filename):
 	return str((base_path / filename).resolve())
 
 app = QApplication([])
+app.setStyle("windows")
+# app.setAttribute(Qt.AA_UseHighDpiPixmaps)
+app.setStyleSheet("""
+	QSizeGrip {
+		color: rgba(0, 0, 0, 0);
+		background: rgba(0, 0, 0, 0);
+		border: none;
+	}
+	QPushButton:focus {
+		outline: none;
+	}
+""")
+
+QFontDatabase.addApplicationFont(resource_path("fonts/ChivoMono-VariableFont_wght.ttf"))
 
 w = ExLayer()
 w.setWindowTitle("Timer")
@@ -558,7 +567,5 @@ w.show()
 w.bgLayer.alwaysOnTopButtonClicked()
 
 clicked = False
-
-w.move(5, 804)
 
 app.exec_()
