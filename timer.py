@@ -102,7 +102,6 @@ class RefreshLoop(QWidget):
 				try:
 					intEl = int(el)
 				except:
-					# print("Invalid string to convert to time: " + str(el))
 					pass
 				arr.append(intEl)
 		else:
@@ -110,7 +109,6 @@ class RefreshLoop(QWidget):
 			try:
 				intEl = int(string)
 			except:
-				# print("Invalid string to convert to time: " + str(string))
 				pass
 			arr.append(intEl)
 
@@ -139,15 +137,11 @@ class RefreshLoop(QWidget):
 		self.count = 0
 
 		self.settings = QSettings("timer_length")
-		# print(self.settings.value("timer_length"))
 
 		try:
 			self.timer_length = int(self.strToSeconds(str(self.settings.value("timer_length"))))
 		except Exception as e:
-			# print(e)
 			self.timer_length = 0
-
-		# print("self.timer_length: " + str(self.timer_length))
 
 	def setActive(self, toggle):
 		self.active = toggle
@@ -159,7 +153,6 @@ class RefreshLoop(QWidget):
 	def setTimeLabel(self, timeLabel):
 		self.timeLabel = timeLabel
 		self.timeLabel.setTimeLabel(int(self.timer_length) * -1, 0, self.active)
-		# self.timeLabel.setTimeLabel(int(self.timer_length), 0)
 
 	def resetTimer(self):
 		self.counter = 0
@@ -176,9 +169,7 @@ class RefreshLoop(QWidget):
 
 			self.resetTimer()
 		except Exception as e:
-			# print(e)
 			self.timer_length = 0
-			# print("Invalid time entered.")
 
 	def timerExpired(self):
 		global clicked
@@ -250,25 +241,16 @@ class TimeLabel(QLabel):
 			op = QGraphicsColorizeEffect()
 			op.setColor(QColor(89, 6, 0))
 
-			# try:
 			self.parent().parent().setGraphicsEffect(op)
-			# except Exception as e:
-			# 	pass
 		else:
 			self.setStyleSheet("color: red;")
 
 			op = QGraphicsColorizeEffect()
-			# try:
 			self.parent().parent().setGraphicsEffect(None)
-			# except Exception as e:
-			# 	pass
 
 	def clearTimerExpiredTheme(self):
 		self.setStyleSheet("color: white;")
-		# try:
 		self.parent().parent().setGraphicsEffect(None)
-		# except Exception as e:
-		# 	pass
 
 class RefreshButton(QPushButton):
 	def __init__(self, controller):
@@ -545,7 +527,6 @@ def resource_path(filename):
 
 app = QApplication([])
 app.setStyle("windows")
-# app.setAttribute(Qt.AA_UseHighDpiPixmaps)
 app.setStyleSheet("""
 	QSizeGrip {
 		color: rgba(0, 0, 0, 0);
