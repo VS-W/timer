@@ -10,4 +10,8 @@ Simple countdown timer with transparency, python + pyqt5. Option to toggle "alwa
 
 ![example](readme_assets/sample.png)
 
-Start and stop the countdown using the ⟳ button. Toggle whether the timer remains visible above all windows using the 👁 button.
+Start and stop the countdown using the ⟳ button. Toggle whether the timer remains visible above all windows using the 👁 button. Click the ⚙ button to set the time, formatted as `minutes:seconds`.
+
+When the timer has expired, click anywhere on the window to reset it.
+
+![expired timer](readme_assets/expired.png)
